@@ -1,19 +1,72 @@
-const express = require("express");
+import express from "express";
+import mongoose from "mongoose";
+
+import databaseConfig from "./mongodb.config.js";
+import Product from "./models/product.model.js";
+
 const app = express();
 
-// make express backend run on port 3000 or localhost:3000
-app.listen(3000, () => {
-    console.log("server is running on port 3000");
-});
+app.use(express.json());
 
 app.get("/", (req, res) => {
-    res.send("Hello from Node API. Location: Home");
+    res.send("Notified from Node API Server.");
 });
 
-app.get("/contact_us", (req, res) => {
-    res.send("Hello from Node API. Location: Contact Us Page");
+app.get("/api/products", async (req, res) => {
+    try {
+        const products = await Product.find({});
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
 
-app.get("/about_us", (req, res) => {
-    res.send("Hello from Node API. Location: About Us Page");
+app.get("/api/product/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id);
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
+
+app.post("/api/products", async (req, res) => {
+    try {
+        // res.send("Data received").status(200);
+        // console.log(`${req.body}`);
+
+        const product = await Product.create(req.body);
+        res.status(200).json(product);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.put("/api/product/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndUpdate(id, req.body);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        const updatedProduct = await Product.findById(id);
+        res.status(200).json(updatedProduct);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+mongoose
+    .connect(
+        `mongodb+srv://admin:${databaseConfig.password}@backenddb.leszy.mongodb.net/Node-API?retryWrites=true&w=majority&appName=backendDB`
+    )
+    .then(() => {
+        console.log("Connected to MongoDB Cluster.");
+        app.listen(3000, () => {
+            console.log("Server is running on port 3000.");
+        });
+    })
+    .catch(() => console.log("Connection to MongoDB Cluster failed."));

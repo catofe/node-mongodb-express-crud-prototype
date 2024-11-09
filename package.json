@@ -2,6 +2,7 @@
   "name": "mongodb-express-crud-prototype",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "node index.js",
@@ -12,7 +13,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
